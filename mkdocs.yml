@@ -1,0 +1,7 @@
+site_name: llm-evaluation-toolkit
+site_description: Tools for evaluating large language model outputs.
+repo_url: https://github.com/your-org/llm-evaluation-toolkit
+theme:
+  name: material
+nav:
+  - Home: index.md
