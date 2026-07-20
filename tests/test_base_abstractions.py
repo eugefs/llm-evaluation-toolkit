@@ -1,7 +1,7 @@
 """Tests for artifact, provider, pipeline, and reporter contracts."""
 
-from datetime import UTC, datetime
 from collections.abc import Callable
+from datetime import UTC, datetime
 from typing import Any, cast
 from uuid import UUID, uuid4
 
@@ -83,7 +83,12 @@ def test_artifact_contract_can_be_constructed() -> None:
 
 @pytest.mark.parametrize(
     "getter",
-    [Artifact.id.fget, Artifact.name.fget, Artifact.metadata.fget, Artifact.created_at.fget],
+    [
+        Artifact.id.fget,
+        Artifact.name.fget,
+        Artifact.metadata.fget,
+        Artifact.created_at.fget,
+    ],
 )
 def test_artifact_abstract_getters_raise_not_implemented(
     getter: Callable[[Artifact], object] | None,
@@ -119,10 +124,12 @@ def test_provider_protocol_is_runtime_checkable() -> None:
 
     assert isinstance(provider, Provider)
     assert provider.name == "example"
+
     name_getter = Provider.name.fget
     assert name_getter is not None
-    result: object = name_getter(cast(Provider, provider))
-    assert result is Ellipsis
+
+    # Protocol placeholder implementations return None when invoked.
+    assert name_getter(cast(Provider, provider)) is None
 
 
 def test_provider_protocol_cannot_be_constructed() -> None:
