@@ -16,12 +16,14 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Typing :: Typed",
 ]
 dependencies = [
   "typer>=0.15",
   "rich>=14",
   "pydantic>=2.11",
+  "openai>=2.46.0",
 ]
 
 [project.optional-dependencies]
@@ -39,9 +41,9 @@ dev = [
 llm-eval = "llm_evaluation_toolkit.cli:app"
 
 [project.urls]
-Documentation = "https://github.com/your-org/llm-evaluation-toolkit#readme"
-Repository = "https://github.com/your-org/llm-evaluation-toolkit"
-Issues = "https://github.com/your-org/llm-evaluation-toolkit/issues"
+Documentation = "https://github.com/eugefs/llm-evaluation-toolkit#readme"
+Repository = "https://github.com/eugefs/llm-evaluation-toolkit"
+Issues = "https://github.com/eugefs/llm-evaluation-toolkit/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/llm_evaluation_toolkit"]
