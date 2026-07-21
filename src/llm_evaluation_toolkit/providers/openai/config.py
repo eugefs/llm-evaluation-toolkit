@@ -16,7 +16,7 @@ class OpenAIProviderConfig(BaseModel):
 
     provider: Literal["openai"] = "openai"
     base_url: str = "https://api.openai.com/v1"
-    api_key: str
+    api_key: str = Field(min_length=1)
     model: str
 
     timeout: float = 60.0

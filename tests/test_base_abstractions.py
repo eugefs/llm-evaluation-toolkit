@@ -84,10 +84,10 @@ def test_artifact_contract_can_be_constructed() -> None:
 @pytest.mark.parametrize(
     "getter",
     [
-        Artifact.id.fget,
-        Artifact.name.fget,
-        Artifact.metadata.fget,
-        Artifact.created_at.fget,
+        cast(Any, Artifact.id).fget,
+        cast(Any, Artifact.name).fget,
+        cast(Any, Artifact.metadata).fget,
+        cast(Any, Artifact.created_at).fget,
     ],
 )
 def test_artifact_abstract_getters_raise_not_implemented(
@@ -109,7 +109,7 @@ def test_pipeline_contract_can_be_constructed() -> None:
     """A complete Pipeline implementation can be instantiated and invoked."""
     pipeline = ExamplePipeline()
 
-    assert pipeline.run(Project(name="baseline")) is None
+    pipeline.run(Project(name="baseline"))
 
 
 def test_pipeline_base_method_raises_not_implemented() -> None:
@@ -125,7 +125,7 @@ def test_provider_protocol_is_runtime_checkable() -> None:
     assert isinstance(provider, Provider)
     assert provider.name == "example"
 
-    name_getter = Provider.name.fget
+    name_getter = cast(Any, Provider.name).fget
     assert name_getter is not None
 
     # Protocol placeholder implementations return None when invoked.
@@ -143,8 +143,9 @@ def test_reporter_protocol_is_runtime_checkable() -> None:
     reporter = ExampleReporter()
 
     assert isinstance(reporter, Reporter)
-    assert reporter.report(Project(name="baseline")) is None
-    assert Reporter.report(reporter, Project(name="baseline")) is None
+
+    reporter.report(Project(name="baseline"))
+    Reporter.report(reporter, Project(name="baseline"))
 
 
 def test_reporter_protocol_cannot_be_constructed() -> None:

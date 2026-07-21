@@ -3,14 +3,14 @@
 import pytest
 from pydantic import ValidationError
 
+from llm_evaluation_toolkit.generation import (
+    GenerationMessage,
+    GenerationRequest,
+)
 from llm_evaluation_toolkit.providers.openai import (
     OpenAIClient,
     OpenAICompatibleProvider,
     OpenAIProviderConfig,
-)
-from llm_evaluation_toolkit.providers.openai.models import (
-    ChatMessage,
-    ChatRequest,
 )
 
 
@@ -37,11 +37,11 @@ def test_config_defaults() -> None:
 
 def test_config_requires_api_key() -> None:
     with pytest.raises(ValidationError):
-        OpenAIProviderConfig(model="gpt-4.1-mini")
+        OpenAIProviderConfig(api_key="", model="gpt-4.1-mini")
 
 
-def test_chat_message() -> None:
-    message = ChatMessage(
+def test_generation_message() -> None:
+    message = GenerationMessage(
         role="user",
         content="Hello!",
     )
@@ -50,10 +50,10 @@ def test_chat_message() -> None:
     assert message.content == "Hello!"
 
 
-def test_chat_request() -> None:
-    request = ChatRequest(
+def test_generation_request() -> None:
+    request = GenerationRequest(
         messages=[
-            ChatMessage(role="user", content="Hello!")
+            GenerationMessage(role="user", content="Hello!")
         ]
     )
 
@@ -71,9 +71,9 @@ def test_client_generate_not_implemented() -> None:
     config = make_config()
     client = OpenAIClient(config)
 
-    request = ChatRequest(
+    request = GenerationRequest(
         messages=[
-            ChatMessage(role="user", content="Hello!")
+            GenerationMessage(role="user", content="Hello!")
         ]
     )
 

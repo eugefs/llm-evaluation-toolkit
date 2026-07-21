@@ -1,12 +1,16 @@
 """OpenAI-compatible provider."""
 
-from llm_evaluation_toolkit.providers.base import Provider
+from llm_evaluation_toolkit.generation import (
+    GenerationRequest,
+    GenerationResponse,
+)
+from llm_evaluation_toolkit.providers import Generator, Provider
 
 from .client import OpenAIClient
 from .config import OpenAIProviderConfig
 
 
-class OpenAICompatibleProvider(Provider):
+class OpenAICompatibleProvider(Provider, Generator):
     """Provider implementation for OpenAI-compatible APIs."""
 
     def __init__(self, config: OpenAIProviderConfig) -> None:
@@ -28,3 +32,10 @@ class OpenAICompatibleProvider(Provider):
     def client(self) -> OpenAIClient:
         """Return the underlying client."""
         return self._client
+
+    def generate(
+        self,
+        request: GenerationRequest,
+    ) -> GenerationResponse:
+        """Generate a response using the underlying client."""
+        return self._client.generate(request)
