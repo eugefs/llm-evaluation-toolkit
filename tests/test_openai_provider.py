@@ -1,4 +1,7 @@
-"""Tests for the OpenAI-compatible provider skeleton."""
+"""Tests for the OpenAI-compatible provider."""
+
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 from pydantic import ValidationError
@@ -37,7 +40,10 @@ def test_config_defaults() -> None:
 
 def test_config_requires_api_key() -> None:
     with pytest.raises(ValidationError):
-        OpenAIProviderConfig(api_key="", model="gpt-4.1-mini")
+        OpenAIProviderConfig(
+            api_key="",
+            model="gpt-4.1-mini",
+        )
 
 
 def test_generation_message() -> None:
@@ -53,7 +59,10 @@ def test_generation_message() -> None:
 def test_generation_request() -> None:
     request = GenerationRequest(
         messages=[
-            GenerationMessage(role="user", content="Hello!")
+            GenerationMessage(
+                role="user",
+                content="Hello!",
+            )
         ]
     )
 
@@ -67,18 +76,50 @@ def test_client_holds_configuration() -> None:
     assert client.config is config
 
 
-def test_client_generate_not_implemented() -> None:
+def test_client_generate() -> None:
+    """The client converts an OpenAI SDK response."""
+
     config = make_config()
     client = OpenAIClient(config)
 
-    request = GenerationRequest(
-        messages=[
-            GenerationMessage(role="user", content="Hello!")
-        ]
+    sdk_response = SimpleNamespace(
+        model="gpt-4.1-mini",
+        choices=[
+            SimpleNamespace(
+                message=SimpleNamespace(content="Hello back!"),
+                finish_reason="stop",
+            )
+        ],
+        usage=SimpleNamespace(
+            prompt_tokens=5,
+            completion_tokens=2,
+            total_tokens=7,
+        ),
     )
 
-    with pytest.raises(NotImplementedError):
-        client.generate(request)
+    client.sdk.chat.completions.create = Mock(return_value=sdk_response)
+
+    response = client.generate(
+        GenerationRequest(
+            messages=[
+                GenerationMessage(
+                    role="user",
+                    content="Hello!",
+                )
+            ]
+        )
+    )
+
+    assert response.content == "Hello back!"
+    assert response.finish_reason == "stop"
+    assert response.model == "gpt-4.1-mini"
+
+    assert response.usage is not None
+    assert response.usage.prompt_tokens == 5
+    assert response.usage.completion_tokens == 2
+    assert response.usage.total_tokens == 7
+
+    client.sdk.chat.completions.create.assert_called_once()
 
 
 def test_provider_initialization() -> None:

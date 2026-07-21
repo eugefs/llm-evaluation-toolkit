@@ -1,10 +1,20 @@
 """OpenAI-compatible client."""
 
+from typing import cast
+
 from openai import OpenAI
+from openai.types.chat import (
+    ChatCompletionAssistantMessageParam,
+    ChatCompletionMessageParam,
+    ChatCompletionSystemMessageParam,
+    ChatCompletionToolMessageParam,
+    ChatCompletionUserMessageParam,
+)
 
 from llm_evaluation_toolkit.generation import (
     GenerationRequest,
     GenerationResponse,
+    TokenUsage,
 )
 
 from .config import OpenAIProviderConfig
@@ -39,7 +49,69 @@ class OpenAIClient:
         self,
         request: GenerationRequest,
     ) -> GenerationResponse:
-        """Generate a response."""
-        raise NotImplementedError(
-            "OpenAIClient.generate() will be implemented in Milestone 9.3."
+        """Generate a response using the OpenAI Chat Completions API."""
+
+        messages: list[ChatCompletionMessageParam] = []
+
+        for message in request.messages:
+            if message.role == "system":
+                messages.append(
+                    cast(
+                        ChatCompletionSystemMessageParam,
+                        {
+                            "role": "system",
+                            "content": message.content,
+                        },
+                    )
+                )
+
+            elif message.role == "user":
+                messages.append(
+                    cast(
+                        ChatCompletionUserMessageParam,
+                        {
+                            "role": "user",
+                            "content": message.content,
+                        },
+                    )
+                )
+
+            elif message.role == "assistant":
+                messages.append(
+                    cast(
+                        ChatCompletionAssistantMessageParam,
+                        {
+                            "role": "assistant",
+                            "content": message.content,
+                        },
+                    )
+                )
+
+            elif message.role == "tool":
+                raise NotImplementedError(
+                    "Tool messages are not supported yet."
+                )
+
+        response = self._client.chat.completions.create(
+            model=self._config.model,
+            messages=messages,
+            temperature=request.temperature,
+            max_tokens=request.max_tokens,
+        )
+
+        choice = response.choices[0]
+
+        usage = None
+        if response.usage is not None:
+            usage = TokenUsage(
+                prompt_tokens=response.usage.prompt_tokens,
+                completion_tokens=response.usage.completion_tokens,
+                total_tokens=response.usage.total_tokens,
+            )
+
+        return GenerationResponse(
+            content=choice.message.content or "",
+            finish_reason=choice.finish_reason,
+            model=response.model,
+            usage=usage,
         )
