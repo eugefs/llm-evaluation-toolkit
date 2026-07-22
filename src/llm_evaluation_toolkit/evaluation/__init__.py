@@ -1,14 +1,19 @@
-"""Provider-independent evaluation API."""
+"""Evaluation package."""
 
-from llm_evaluation_toolkit.evaluation.datasets import EvaluationDataset
-from llm_evaluation_toolkit.evaluation.evaluator import Evaluator
-from llm_evaluation_toolkit.evaluation.metrics import ExactMatchMetric
-from llm_evaluation_toolkit.evaluation.models import (
+from .datasets import EvaluationDataset
+from .evaluator import Evaluator
+from .metric_result import MetricResult
+from .metrics import (
+    ExactMatchMetric,
+    LatencyMetric,
+    TokenUsageMetric,
+)
+from .models import (
     EvaluationCase,
     EvaluationResult,
 )
-from llm_evaluation_toolkit.evaluation.protocols import Metric
-from llm_evaluation_toolkit.evaluation.report import EvaluationReport
+from .protocols import Metric
+from .report import EvaluationReport
 
 __all__ = [
     "EvaluationCase",
@@ -17,5 +22,8 @@ __all__ = [
     "EvaluationResult",
     "Evaluator",
     "ExactMatchMetric",
+    "LatencyMetric",
     "Metric",
+    "MetricResult",
+    "TokenUsageMetric",
 ]

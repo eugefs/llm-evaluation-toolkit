@@ -3,6 +3,9 @@
 import asyncio
 
 from llm_evaluation_toolkit.evaluation.datasets import EvaluationDataset
+from llm_evaluation_toolkit.evaluation.metric_result import (
+    MetricResult,
+)
 from llm_evaluation_toolkit.evaluation.models import (
     EvaluationCase,
     EvaluationResult,
@@ -20,10 +23,21 @@ class Evaluator:
     def __init__(
         self,
         generator: Generator,
-        metric: Metric,
+        metric: Metric | None = None,
+        metrics: list[Metric] | None = None,
     ) -> None:
+        """Initialize evaluator."""
+
         self._generator = generator
-        self._metric = metric
+
+        if metrics is not None:
+            self._metrics = metrics
+        elif metric is not None:
+            self._metrics = [metric]
+        else:
+            raise ValueError(
+                "At least one metric is required",
+            )
 
     def evaluate(
         self,
@@ -31,8 +45,19 @@ class Evaluator:
     ) -> EvaluationResult:
         """Evaluate a single case."""
 
-        response = self._generator.generate(case.request)
-        score = self._metric.score(case, response)
+        response = self._generator.generate(
+            case.request,
+        )
+
+        scores = [
+            metric.score(
+                case,
+                response,
+            )
+            for metric in self._metrics
+        ]
+
+        score = sum(scores) / len(scores)
 
         return EvaluationResult(
             case_id=case.id,
@@ -40,6 +65,27 @@ class Evaluator:
             score=score,
             passed=score >= 1.0,
         )
+
+    def evaluate_metrics(
+        self,
+        case: EvaluationCase,
+    ) -> list[MetricResult]:
+        """Return individual metric results."""
+
+        response = self._generator.generate(
+            case.request,
+        )
+
+        return [
+            MetricResult(
+                name=metric.name,
+                score=metric.score(
+                    case,
+                    response,
+                ),
+            )
+            for metric in self._metrics
+        ]
 
     def evaluate_dataset(
         self,
@@ -68,10 +114,15 @@ class Evaluator:
                 case.request,
             )
 
-        score = self._metric.score(
-            case,
-            response,
-        )
+        scores = [
+            metric.score(
+                case,
+                response,
+            )
+            for metric in self._metrics
+        ]
+
+        score = sum(scores) / len(scores)
 
         return EvaluationResult(
             case_id=case.id,
@@ -84,7 +135,7 @@ class Evaluator:
         self,
         dataset: EvaluationDataset,
     ) -> list[EvaluationResult]:
-        """Evaluate a dataset asynchronously."""
+        """Evaluate every case asynchronously."""
 
         tasks = [
             self.evaluate_async(case)
