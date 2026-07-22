@@ -1,4 +1,4 @@
-"""OpenAI-compatible provider package."""
+"""OpenAI provider."""
 
 from .client import OpenAIClient
 from .config import OpenAIProviderConfig
