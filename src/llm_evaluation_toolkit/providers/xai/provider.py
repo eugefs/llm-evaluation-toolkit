@@ -20,6 +20,11 @@ class XAIProvider(Provider, Generator):
         self._client = XAIClient(config)
 
     @property
+    def name(self) -> str:
+        """Return provider name."""
+        return "xai"
+
+    @property
     def config(self) -> XAIProviderConfig:
         """Return the provider configuration."""
         return self._config

@@ -20,6 +20,11 @@ class GoogleProvider(Provider, Generator):
         self._client = GoogleClient(config)
 
     @property
+    def name(self) -> str:
+        """Return provider name."""
+        return "google"
+
+    @property
     def config(self) -> GoogleProviderConfig:
         """Return the provider configuration."""
         return self._config

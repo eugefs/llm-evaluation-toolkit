@@ -20,6 +20,11 @@ class AnthropicProvider(Provider, Generator):
         self._client = AnthropicClient(config)
 
     @property
+    def name(self) -> str:
+        """Return provider name."""
+        return "anthropic"
+
+    @property
     def config(self) -> AnthropicProviderConfig:
         """Return the provider configuration."""
         return self._config
