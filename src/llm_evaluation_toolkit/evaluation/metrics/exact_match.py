@@ -20,8 +20,4 @@ class ExactMatchMetric(Metric):
     ) -> float:
         """Return a normalized exact-match score."""
 
-        return (
-            1.0
-            if response.content == case.expected_output
-            else 0.0
-        )
+        return 1.0 if response.content == case.expected_output else 0.0

@@ -42,7 +42,4 @@ class Evaluator:
     ) -> list[EvaluationResult]:
         """Evaluate every case in a dataset."""
 
-        return [
-            self.evaluate(case)
-            for case in dataset.cases
-        ]
+        return [self.evaluate(case) for case in dataset.cases]

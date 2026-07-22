@@ -87,9 +87,7 @@ class OpenAIClient:
                 )
 
             elif message.role == "tool":
-                raise NotImplementedError(
-                    "Tool messages are not supported yet."
-                )
+                raise NotImplementedError("Tool messages are not supported yet.")
 
         response = self._client.chat.completions.create(
             model=self._config.model,

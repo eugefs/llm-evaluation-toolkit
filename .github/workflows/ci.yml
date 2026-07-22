@@ -17,10 +17,12 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
+
       matrix:
         python-version:
-          - "3.12"
           - "3.13"
+          - "3.14"
 
     steps:
 
@@ -31,6 +33,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
 
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
@@ -47,5 +50,18 @@ jobs:
       - name: MyPy
         run: mypy src
 
-      - name: Pytest
-        run: pytest
+      - name: Pytest + Coverage
+        run: |
+          pytest \
+            --cov=src/llm_evaluation_toolkit \
+            --cov-report=term-missing \
+            --cov-fail-under=90
+
+      - name: Bandit
+        run: bandit -r src
+
+      - name: Pip Audit
+        run: pip-audit
+
+      - name: Build Documentation
+        run: mkdocs build --strict
