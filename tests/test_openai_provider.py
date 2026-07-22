@@ -1,7 +1,7 @@
 """Tests for the OpenAI-compatible provider."""
 
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from pydantic import ValidationError
@@ -97,18 +97,21 @@ def test_client_generate() -> None:
         ),
     )
 
-    client.sdk.chat.completions.create = Mock(return_value=sdk_response)
-
-    response = client.generate(
-        GenerationRequest(
-            messages=[
-                GenerationMessage(
-                    role="user",
-                    content="Hello!",
-                )
-            ]
+    with patch.object(
+        client.sdk.chat.completions,
+        "create",
+        return_value=sdk_response,
+    ) as mock_create:
+        response = client.generate(
+            GenerationRequest(
+                messages=[
+                    GenerationMessage(
+                        role="user",
+                        content="Hello!",
+                    )
+                ]
+            )
         )
-    )
 
     assert response.content == "Hello back!"
     assert response.finish_reason == "stop"
@@ -119,7 +122,7 @@ def test_client_generate() -> None:
     assert response.usage.completion_tokens == 2
     assert response.usage.total_tokens == 7
 
-    client.sdk.chat.completions.create.assert_called_once()
+    mock_create.assert_called_once()
 
 
 def test_provider_initialization() -> None:

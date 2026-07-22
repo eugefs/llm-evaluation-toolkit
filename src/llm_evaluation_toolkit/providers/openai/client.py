@@ -7,7 +7,6 @@ from openai.types.chat import (
     ChatCompletionAssistantMessageParam,
     ChatCompletionMessageParam,
     ChatCompletionSystemMessageParam,
-    ChatCompletionToolMessageParam,
     ChatCompletionUserMessageParam,
 )
 
