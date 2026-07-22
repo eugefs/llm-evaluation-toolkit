@@ -1,6 +1,7 @@
 from llm_evaluation_toolkit.evaluation import (
     EvaluationCase,
     EvaluationDataset,
+    EvaluationReport,
     EvaluationResult,
     Evaluator,
     ExactMatchMetric,
@@ -139,9 +140,6 @@ def test_evaluate_dataset() -> None:
 
     assert len(results) == 2
     assert all(result.score == 1.0 for result in results)
-
-
-from llm_evaluation_toolkit.evaluation import EvaluationReport
 
 
 def test_evaluation_report_statistics() -> None:
