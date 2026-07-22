@@ -1,6 +1,7 @@
 from llm_evaluation_toolkit.evaluation import (
     EvaluationCase,
     EvaluationDataset,
+    EvaluationReport,
     EvaluationResult,
     Evaluator,
     ExactMatchMetric,

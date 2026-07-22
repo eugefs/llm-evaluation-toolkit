@@ -8,10 +8,12 @@ from llm_evaluation_toolkit.evaluation.models import (
     EvaluationResult,
 )
 from llm_evaluation_toolkit.evaluation.protocols import Metric
+from llm_evaluation_toolkit.evaluation.report import EvaluationReport
 
 __all__ = [
     "EvaluationCase",
     "EvaluationDataset",
+    "EvaluationReport",
     "EvaluationResult",
     "Evaluator",
     "ExactMatchMetric",
