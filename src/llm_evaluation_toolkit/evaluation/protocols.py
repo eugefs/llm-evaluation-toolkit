@@ -1,13 +1,9 @@
-"""Evaluation metric protocol."""
+"""Evaluation protocols."""
 
 from typing import Protocol
 
-from llm_evaluation_toolkit.evaluation import (
-    EvaluationCase,
-)
-from llm_evaluation_toolkit.generation import (
-    GenerationResponse,
-)
+from llm_evaluation_toolkit.evaluation.models import EvaluationCase
+from llm_evaluation_toolkit.generation import GenerationResponse
 
 
 class Metric(Protocol):

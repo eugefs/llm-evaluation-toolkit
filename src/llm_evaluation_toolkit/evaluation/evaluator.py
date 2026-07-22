@@ -1,10 +1,10 @@
 """Evaluation engine."""
 
-from llm_evaluation_toolkit.evaluation import (
+from llm_evaluation_toolkit.evaluation.models import (
     EvaluationCase,
     EvaluationResult,
 )
-from llm_evaluation_toolkit.evaluation.metrics import Metric
+from llm_evaluation_toolkit.evaluation.protocols import Metric
 from llm_evaluation_toolkit.providers import Generator
 
 
