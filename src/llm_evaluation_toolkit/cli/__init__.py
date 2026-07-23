@@ -132,22 +132,44 @@ def compare(
 ) -> None:
     """Compare two experiment results."""
 
-    storage = ExperimentStorage(
-        Path(directory),
-    )
+    try:
+        storage = ExperimentStorage(
+            Path(directory),
+        )
 
-    first_result = storage.load(
-        first,
-    )
+        first_result = storage.load(
+            first,
+        )
 
-    second_result = storage.load(
-        second,
-    )
+        second_result = storage.load(
+            second,
+        )
 
-    report = ExperimentComparator().compare(
-        first_result,
-        second_result,
-    )
+        report = ExperimentComparator().compare(
+            first_result,
+            second_result,
+        )
+
+    except FileNotFoundError as exc:
+        OutputFormatter.message(
+            f"Experiment not found: {exc.filename}",
+        )
+
+        OutputFormatter.message(
+            "Available results:",
+        )
+
+        result_path = Path(directory)
+
+        if result_path.exists():
+            for item in result_path.glob("*.json"):
+                OutputFormatter.message(
+                    f"- {item.stem}",
+                )
+
+        raise typer.Exit(
+            code=1,
+        )
 
     OutputFormatter.message(
         "Comparison Report",
@@ -353,86 +375,4 @@ def dashboard() -> None:
 
     OutputFormatter.message(
         f"Success Rate: {data['success_rate']}%",
-    )
-
-@app.command()
-def compare(
-    first: str,
-    second: str,
-    directory: str = "results",
-) -> None:
-    """Compare two experiment results."""
-
-    try:
-        storage = ExperimentStorage(
-            Path(directory),
-        )
-
-        first_result = storage.load(
-            first,
-        )
-
-        second_result = storage.load(
-            second,
-        )
-
-        report = ExperimentComparator().compare(
-            first_result,
-            second_result,
-        )
-
-    except FileNotFoundError as exc:
-        OutputFormatter.message(
-            (
-                f"Experiment not found: {exc.filename}"
-            ),
-        )
-
-        OutputFormatter.message(
-            "Available results:",
-        )
-
-        path = Path(directory)
-
-        if path.exists():
-            for item in path.glob("*.json"):
-                OutputFormatter.message(
-                    f"- {item.stem}",
-                )
-
-        raise typer.Exit(
-            code=1,
-        )
-
-    OutputFormatter.message(
-        "Comparison Report",
-    )
-
-    for entry in report.entries:
-        OutputFormatter.message(
-            (
-                f"{entry.name}: "
-                f"{entry.delta:+}"
-            ),
-        )
-
-    OutputFormatter.message(
-        (
-            f"Latency: "
-            f"{report.latency_delta:+.2f} ms"
-        ),
-    )
-
-    OutputFormatter.message(
-        (
-            f"Cost: "
-            f"{report.cost_delta:+.6f}"
-        ),
-    )
-
-    OutputFormatter.message(
-        (
-            f"Tokens: "
-            f"{report.token_delta:+d}"
-        ),
     )

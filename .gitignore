@@ -12,3 +12,15 @@ site/
 dist/
 build/
 *.egg-info/
+# Generated evaluation outputs
+results/
+benchmark-schema.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Build
+dist/
+build/
+*.egg-info/
