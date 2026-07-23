@@ -35,6 +35,57 @@
       "title": "BenchmarkCase",
       "type": "object"
     },
+    "BenchmarkMetadata": {
+      "additionalProperties": false,
+      "description": "Additional benchmark information.",
+      "properties": {
+        "author": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Author"
+        },
+        "created": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created"
+        },
+        "license": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "License"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        }
+      },
+      "title": "BenchmarkMetadata",
+      "type": "object"
+    },
     "BenchmarkMetric": {
       "additionalProperties": false,
       "description": "Metric configuration.",
@@ -296,6 +347,17 @@
       ],
       "default": null,
       "title": "Description"
+    },
+    "metadata": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BenchmarkMetadata"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "dataset": {
       "$ref": "#/$defs/EvaluationDataset"
