@@ -1,0 +1,33 @@
+name: example-benchmark
+
+version: "1.0"
+
+description: Example LLM evaluation benchmark.
+
+dataset:
+  name: example-dataset
+  cases:
+    - id: greeting-001
+      request:
+        messages:
+          - role: user
+            content: "Say hello."
+      expected_output: "Hello"
+
+providers:
+  - name: openai
+    model: ${OPENAI_MODEL}
+
+metrics:
+  - name: exact_match
+
+profiles:
+  - name: dev
+    providers:
+      - name: openai
+        model: gpt-5-mini
+
+  - name: production
+    providers:
+      - name: openai
+        model: gpt-5

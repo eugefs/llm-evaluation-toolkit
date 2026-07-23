@@ -1,9 +1,13 @@
-"""Built-in evaluation metrics."""
+"""Evaluation metrics."""
 
-from llm_evaluation_toolkit.evaluation.metrics.exact_match import (
-    ExactMatchMetric,
-)
+from .exact_match import ExactMatchMetric
+from .latency import LatencyMetric
+from .registry import MetricRegistry
+from .token_usage import TokenUsageMetric
 
 __all__ = [
     "ExactMatchMetric",
+    "LatencyMetric",
+    "MetricRegistry",
+    "TokenUsageMetric",
 ]
