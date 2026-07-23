@@ -47,4 +47,27 @@ class ExperimentComparator:
 
         return ComparisonReport(
             entries=entries,
+            latency_delta=(
+                second.latency_ms
+                -
+                first.latency_ms
+            ),
+            cost_delta=(
+                second.estimated_cost
+                -
+                first.estimated_cost
+            ),
+            token_delta=(
+                (
+                    second.tokens_input
+                    +
+                    second.tokens_output
+                )
+                -
+                (
+                    first.tokens_input
+                    +
+                    first.tokens_output
+                )
+            ),
         )

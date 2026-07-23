@@ -1,21 +1,16 @@
 """Command line interface."""
 
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
 import typer
-
-from llm_evaluation_toolkit.plugins import (
-    PluginLoader,
-    PluginRegistry,
-)
 
 from llm_evaluation_toolkit.benchmarks import (
     BenchmarkLoader,
     BenchmarkRegistry,
     BenchmarkSchema,
 )
-from datetime import datetime
 
 from llm_evaluation_toolkit.experiments import (
     ExperimentComparator,
@@ -24,6 +19,12 @@ from llm_evaluation_toolkit.experiments import (
     RunRecord,
 )
 
+from llm_evaluation_toolkit.plugins import (
+    PluginLoader,
+    PluginRegistry,
+)
+
+from .dashboard import Dashboard
 from .main import run_benchmark
 from .output import OutputFormatter
 
@@ -83,6 +84,7 @@ def run(
             code=1,
         )
 
+
 @app.command()
 def validate(
     benchmark: str,
@@ -119,6 +121,65 @@ def schema(
 
     OutputFormatter.message(
         f"Schema saved: {path}",
+    )
+
+
+@app.command()
+def compare(
+    first: str,
+    second: str,
+    directory: str = "results",
+) -> None:
+    """Compare two experiment results."""
+
+    storage = ExperimentStorage(
+        Path(directory),
+    )
+
+    first_result = storage.load(
+        first,
+    )
+
+    second_result = storage.load(
+        second,
+    )
+
+    report = ExperimentComparator().compare(
+        first_result,
+        second_result,
+    )
+
+    OutputFormatter.message(
+        "Comparison Report",
+    )
+
+    for entry in report.entries:
+        OutputFormatter.message(
+            (
+                f"{entry.name}: "
+                f"{entry.delta:+}"
+            ),
+        )
+
+    OutputFormatter.message(
+        (
+            f"Latency: "
+            f"{report.latency_delta:+.2f} ms"
+        ),
+    )
+
+    OutputFormatter.message(
+        (
+            f"Cost: "
+            f"{report.cost_delta:+.6f}"
+        ),
+    )
+
+    OutputFormatter.message(
+        (
+            f"Tokens: "
+            f"{report.token_delta:+d}"
+        ),
     )
 
 
@@ -189,16 +250,6 @@ def info(
         "name": loaded.name,
         "version": loaded.version,
         "description": loaded.description,
-        "author": (
-            loaded.metadata.author
-            if loaded.metadata
-            else None
-        ),
-        "tags": (
-            loaded.metadata.tags
-            if loaded.metadata
-            else []
-        ),
     }
 
     if json_output:
@@ -252,6 +303,8 @@ def history(
                 f"{record.status}"
             ),
         )
+
+
 @app.command()
 def plugins() -> None:
     """List installed plugins."""
@@ -274,3 +327,30 @@ def plugins() -> None:
         OutputFormatter.message(
             f"- {plugin}",
         )
+
+
+@app.command()
+def dashboard() -> None:
+    """Show evaluation dashboard."""
+
+    data = Dashboard().summary()
+
+    OutputFormatter.message(
+        "Evaluation Dashboard",
+    )
+
+    OutputFormatter.message(
+        f"Runs: {data['total_runs']}",
+    )
+
+    OutputFormatter.message(
+        f"Completed: {data['completed']}",
+    )
+
+    OutputFormatter.message(
+        f"Failed: {data['failed']}",
+    )
+
+    OutputFormatter.message(
+        f"Success Rate: {data['success_rate']}%",
+    )

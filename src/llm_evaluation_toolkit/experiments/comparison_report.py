@@ -27,3 +27,9 @@ class ComparisonReport(BaseModel):
     )
 
     entries: list[ComparisonEntry]
+
+    latency_delta: float = 0.0
+
+    cost_delta: float = 0.0
+
+    token_delta: int = 0

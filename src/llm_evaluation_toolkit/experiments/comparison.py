@@ -35,6 +35,12 @@ class ExperimentComparison(BaseModel):
         default_factory=list,
     )
 
+    latency_delta: float = 0.0
+
+    cost_delta: float = 0.0
+
+    token_delta: int = 0
+
     @classmethod
     def from_results(
         cls,

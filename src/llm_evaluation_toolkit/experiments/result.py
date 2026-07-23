@@ -26,3 +26,13 @@ class ExperimentResult(BaseModel):
     reports: dict[str, EvaluationReport] = Field(
         default_factory=dict,
     )
+
+    score: float = 0.0
+
+    tokens_input: int = 0
+
+    tokens_output: int = 0
+
+    latency_ms: float = 0.0
+
+    estimated_cost: float = 0.0
