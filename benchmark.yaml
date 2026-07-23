@@ -1,0 +1,10 @@
+name: smoke-test
+version: "1.0"
+
+description: Minimal benchmark
+
+dataset:
+  name: smoke-dataset
+  cases: []
+
+cases: []
