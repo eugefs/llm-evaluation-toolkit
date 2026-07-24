@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "llm_evaluation_toolkit"
-version = "0.1.0"
+version = "0.2.0"
 description = "Tools for evaluating large language model outputs."
 readme = "README.md"
 requires-python = ">=3.13"
