@@ -1,7 +1,5 @@
 """Experiment runner."""
 
-from typing import cast
-
 from llm_evaluation_toolkit.evaluation import (
     EvaluationDataset,
     EvaluationReport,
@@ -43,10 +41,13 @@ class ExperimentRunner:
                 provider_configs[provider_name],
             )
 
-            generator = cast(
-                Generator,
-                provider,
-            )
+            if not isinstance(provider, Generator):
+                raise TypeError(
+                    f"Provider '{provider_name}' "
+                    "does not support generation",
+                )
+
+            generator = provider
 
             metrics = [
                 self._resolve_metric(metric_name)
