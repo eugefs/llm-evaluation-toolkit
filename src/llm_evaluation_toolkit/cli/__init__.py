@@ -77,12 +77,10 @@ def run(
             )
 
     except Exception as exc:
-        typer.echo(
+        OutputFormatter.message(
             f"Error: {exc}",
         )
-        raise typer.Exit(
-            code=1,
-        )
+        raise typer.Exit(code=1)
 
 
 @app.command()
@@ -101,19 +99,17 @@ def validate(
         )
 
     except Exception as exc:
-        typer.echo(
+        OutputFormatter.message(
             f"Error: {exc}",
         )
-        raise typer.Exit(
-            code=1,
-        )
+        raise typer.Exit(code=1)
 
 
 @app.command()
 def schema(
     output: str = "benchmark-schema.json",
 ) -> None:
-    """Generate benchmark JSON schema."""
+    """Generate benchmark schema."""
 
     path = BenchmarkSchema.save(
         output,
@@ -155,21 +151,7 @@ def compare(
             f"Experiment not found: {exc.filename}",
         )
 
-        OutputFormatter.message(
-            "Available results:",
-        )
-
-        result_path = Path(directory)
-
-        if result_path.exists():
-            for item in result_path.glob("*.json"):
-                OutputFormatter.message(
-                    f"- {item.stem}",
-                )
-
-        raise typer.Exit(
-            code=1,
-        )
+        raise typer.Exit(code=1)
 
     OutputFormatter.message(
         "Comparison Report",
@@ -179,28 +161,28 @@ def compare(
         OutputFormatter.message(
             (
                 f"{entry.name}: "
-                f"{entry.delta:+}"
+                f"{entry.score_delta:+.4f}"
             ),
         )
 
     OutputFormatter.message(
         (
             f"Latency: "
-            f"{report.latency_delta:+.2f} ms"
+            f"{report.performance.latency_delta:+.2f} ms"
         ),
     )
 
     OutputFormatter.message(
         (
             f"Cost: "
-            f"{report.cost_delta:+.6f}"
+            f"{report.performance.cost_delta:+.6f}"
         ),
     )
 
     OutputFormatter.message(
         (
             f"Tokens: "
-            f"{report.token_delta:+d}"
+            f"{report.performance.token_delta:+d}"
         ),
     )
 
@@ -210,13 +192,10 @@ def list_command(
     directory: str = "examples",
     json_output: Annotated[
         bool,
-        typer.Option(
-            "--json",
-            help="Output JSON format.",
-        ),
+        typer.Option("--json"),
     ] = False,
 ) -> None:
-    """List available benchmarks."""
+    """List benchmarks."""
 
     registry = BenchmarkRegistry(
         directory,
@@ -235,62 +214,27 @@ def list_command(
         )
         return
 
-    if not benchmarks:
-        OutputFormatter.message(
-            "No benchmarks found",
-        )
-        return
-
-    OutputFormatter.message(
-        "Available benchmarks:",
-    )
-
     for benchmark in benchmarks:
         OutputFormatter.message(
-            f"- {benchmark}",
+            benchmark,
         )
 
 
 @app.command()
 def info(
     benchmark: str,
-    json_output: Annotated[
-        bool,
-        typer.Option(
-            "--json",
-            help="Output JSON format.",
-        ),
-    ] = False,
 ) -> None:
-    """Show benchmark metadata."""
+    """Show benchmark information."""
 
     loaded = BenchmarkLoader().load(
         benchmark,
     )
 
-    data = {
-        "name": loaded.name,
-        "version": loaded.version,
-        "description": loaded.description,
-    }
-
-    if json_output:
-        OutputFormatter.json(
-            data,
-        )
-        return
-
     OutputFormatter.table(
         "Benchmark Info",
         [
-            (
-                "Name",
-                loaded.name,
-            ),
-            (
-                "Version",
-                loaded.version,
-            ),
+            ("Name", loaded.name),
+            ("Version", loaded.version),
         ],
     )
 
@@ -299,29 +243,14 @@ def info(
 def history(
     path: str = "results/history.json",
 ) -> None:
-    """Show experiment history."""
+    """Show history."""
 
-    storage = HistoryStorage(
-        path,
-    )
-
-    records = storage.list()
-
-    if not records:
-        OutputFormatter.message(
-            "No runs found",
-        )
-        return
-
-    OutputFormatter.message(
-        "Run History",
-    )
+    records = HistoryStorage(path).list()
 
     for record in records:
         OutputFormatter.message(
             (
                 f"{record.name} | "
-                f"{record.created_at} | "
                 f"{record.status}"
             ),
         )
@@ -329,31 +258,19 @@ def history(
 
 @app.command()
 def plugins() -> None:
-    """List installed plugins."""
+    """List plugins."""
 
     PluginLoader.discover()
 
-    available = PluginRegistry.available()
-
-    if not available:
+    for plugin in PluginRegistry.available():
         OutputFormatter.message(
-            "No plugins installed",
-        )
-        return
-
-    OutputFormatter.message(
-        "Installed plugins:",
-    )
-
-    for plugin in available:
-        OutputFormatter.message(
-            f"- {plugin}",
+            plugin,
         )
 
 
 @app.command()
 def dashboard() -> None:
-    """Show evaluation dashboard."""
+    """Show dashboard."""
 
     data = Dashboard().summary()
 

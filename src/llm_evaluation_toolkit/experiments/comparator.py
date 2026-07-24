@@ -3,6 +3,7 @@
 from .comparison_report import (
     ComparisonEntry,
     ComparisonReport,
+    PerformanceDelta,
 )
 from .result import ExperimentResult
 
@@ -26,48 +27,43 @@ class ExperimentComparator:
             if name not in second_reports:
                 continue
 
-            first_score = len(
-                first_reports[name].results,
+            first_results = first_reports[name].results
+            second_results = second_reports[name].results
+
+            first_score = (
+                sum(
+                    result.score
+                    for result in first_results
+                )
+                / len(first_results)
+                if first_results
+                else 0.0
             )
 
-            second_score = len(
-                second_reports[name].results,
+            second_score = (
+                sum(
+                    result.score
+                    for result in second_results
+                )
+                / len(second_results)
+                if second_results
+                else 0.0
             )
 
             entries.append(
                 ComparisonEntry(
                     name=name,
-                    first=float(first_score),
-                    second=float(second_score),
-                    delta=float(
-                        second_score - first_score,
+                    first_score=first_score,
+                    second_score=second_score,
+                    score_delta=(
+                        second_score
+                        -
+                        first_score
                     ),
                 ),
             )
 
         return ComparisonReport(
             entries=entries,
-            latency_delta=(
-                second.latency_ms
-                -
-                first.latency_ms
-            ),
-            cost_delta=(
-                second.estimated_cost
-                -
-                first.estimated_cost
-            ),
-            token_delta=(
-                (
-                    second.tokens_input
-                    +
-                    second.tokens_output
-                )
-                -
-                (
-                    first.tokens_input
-                    +
-                    first.tokens_output
-                )
-            ),
+            performance=PerformanceDelta(),
         )
